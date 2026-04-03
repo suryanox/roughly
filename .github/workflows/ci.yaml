@@ -44,6 +44,8 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  
 
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@master
@@ -85,3 +87,12 @@ jobs:
         run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
+
+      - name: Create Git tag
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          VERSION=${{ steps.meta.outputs.version }}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
