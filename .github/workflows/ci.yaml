@@ -82,6 +82,6 @@ jobs:
 
       - name: Publish to crates.io
         if: steps.check.outputs.skip == 'false'
-        run: cargo publish --token $CRATES_TOKEN
+        run: cargo publish
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
