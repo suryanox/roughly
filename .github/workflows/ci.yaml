@@ -84,4 +84,4 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: cargo publish
         env:
-          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
