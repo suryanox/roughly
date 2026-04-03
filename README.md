@@ -14,6 +14,7 @@
 | `HyperLogLog` | How many unique items? | O(log log n) | ~2% std error |
 | `CountMinSketch` | How often does this item appear? | O(1/ε · log 1/δ) | Tunable ε, δ |
 
+---
 ## Why `roughly`?
 
 The Rust ecosystem has several fragmented crates for individual probabilistic structures, but no single crate that:
@@ -29,9 +30,6 @@ The Rust ecosystem has several fragmented crates for individual probabilistic st
 ```toml
 [dependencies]
 roughly = "0.1"
-
-# Optional features:
-roughly = { version = "0.1", features = ["serde"] }
 ```
 
 ## Quick Start
@@ -49,7 +47,10 @@ let mut bloom = BloomFilter::builder()
 bloom.insert(&"https://example.com");
 assert!(bloom.contains(&"https://example.com"));  // always true
 bloom.contains(&"https://other.com") => probably false
+```
 
+
+```rust
 // "How many unique users visited today?"
 
 let mut hll = HyperLogLog::builder()
@@ -60,7 +61,10 @@ for user_id in 0..1_000_000u64 {
     hll.insert(&user_id);
 }
 println!("~{} unique users", hll.count()); // ~1_000_000
+```
 
+
+```rust
 // "What's the frequency of this search term?"
 
 let mut cms = CountMinSketch::builder()
