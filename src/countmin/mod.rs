@@ -293,8 +293,15 @@ mod tests {
 
     #[test]
     fn merge_adds_counts() {
-        let mut a = cms();
-        let mut b = cms();
+        let hasher = crate::hash::default_hasher();
+        let mut a = CountMinSketch::builder_with_hasher(hasher.clone())
+            .error_rate(0.001)
+            .confidence(0.99)
+            .build();
+        let mut b = CountMinSketch::builder_with_hasher(hasher)
+            .error_rate(0.001)
+            .confidence(0.99)
+            .build();
         for _ in 0..100 { a.insert(&"key"); }
         for _ in 0..200 { b.insert(&"key"); }
         a.merge(&b);
