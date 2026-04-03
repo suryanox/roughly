@@ -37,3 +37,51 @@ jobs:
 
       - name: Test (no default features)
         run: cargo test --no-default-features
+
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Read crate metadata
+        id: meta
+        run: |
+          NAME=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get latest crates.io version
+        id: latest
+        run: |
+          LATEST=$(curl -s "https://crates.io/api/v1/crates/${{ steps.meta.outputs.name }}" \
+            | jq -r '.crate.max_version')
+          echo "latest=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: check
+        run: |
+          echo "local=${{ steps.meta.outputs.version }}"
+          echo "remote=${{ steps.latest.outputs.latest }}"
+
+          if [ "${{ steps.meta.outputs.version }}" = "${{ steps.latest.outputs.latest }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to crates.io
+        if: steps.check.outputs.skip == 'false'
+        run: cargo publish --token $CRATES_TOKEN
+        env:
+          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
