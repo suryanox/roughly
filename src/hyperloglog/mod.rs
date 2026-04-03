@@ -70,23 +70,10 @@ impl<H: BuildHasher> HyperLogLog<H> {
     pub fn precision(&self) -> u32 {
         self.b
     }
-}
 
-impl<T: Hash, H: BuildHasher> CardinalitySketch<T> for HyperLogLog<H> {
-    fn insert(&mut self, item: &T) {
-        let (h, _) = double_hash(&self.build_hasher, item);
-
-        let idx = (h >> (64 - self.b)) as usize;
-
-        let remaining = h << self.b;
-        let rho = remaining.leading_zeros() + 1;
-
-        if rho > u32::from(self.registers[idx]) {
-            self.registers[idx] = rho as u8;
-        }
-    }
-
-    fn count(&self) -> u64 {
+    /// Returns the estimated number of distinct items.
+    #[must_use]
+    pub fn count(&self) -> u64 {
         let m = self.m as f64;
 
         let z: f64 = self
@@ -111,11 +98,18 @@ impl<T: Hash, H: BuildHasher> CardinalitySketch<T> for HyperLogLog<H> {
         raw.round() as u64
     }
 
-    fn std_error(&self) -> f64 {
+    /// Returns the standard error of the estimate.
+    #[must_use]
+    pub fn std_error(&self) -> f64 {
         self.std_error
     }
 
-    fn merge(&mut self, other: &Self) {
+    /// Merges another HyperLogLog into this one.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the sketches have different precision.
+    pub fn merge(&mut self, other: &Self) {
         assert_eq!(
             self.m, other.m,
             "cannot merge HyperLogLog with different precision"
@@ -125,8 +119,40 @@ impl<T: Hash, H: BuildHasher> CardinalitySketch<T> for HyperLogLog<H> {
         }
     }
 
-    fn clear(&mut self) {
+    /// Resets the sketch to its initial empty state.
+    pub fn clear(&mut self) {
         self.registers.iter_mut().for_each(|r| *r = 0);
+    }
+}
+
+impl<T: Hash, H: BuildHasher> CardinalitySketch<T> for HyperLogLog<H> {
+    fn insert(&mut self, item: &T) {
+        let (h, _) = double_hash(&self.build_hasher, item);
+
+        let idx = (h >> (64 - self.b)) as usize;
+
+        let remaining = h << self.b;
+        let rho = remaining.leading_zeros() + 1;
+
+        if rho > u32::from(self.registers[idx]) {
+            self.registers[idx] = rho as u8;
+        }
+    }
+
+    fn count(&self) -> u64 {
+        Self::count(self)
+    }
+
+    fn std_error(&self) -> f64 {
+        Self::std_error(self)
+    }
+
+    fn merge(&mut self, other: &Self) {
+        Self::merge(self, other)
+    }
+
+    fn clear(&mut self) {
+        Self::clear(self)
     }
 }
 

@@ -98,6 +98,30 @@ impl<H: BuildHasher> CountMinSketch<H> {
     fn counter(&self, row: usize, col: u64) -> u64 {
         self.counters[row * self.width + col as usize]
     }
+
+    /// Returns the error rate (epsilon) of the sketch.
+    #[must_use]
+    pub fn error_rate(&self) -> f64 {
+        self.error_rate
+    }
+
+    /// Returns the confidence level (1 - delta) of the sketch.
+    #[must_use]
+    pub fn confidence(&self) -> f64 {
+        self.confidence
+    }
+
+    /// Returns the total count of all insertions.
+    #[must_use]
+    pub fn total(&self) -> u64 {
+        self.total
+    }
+
+    /// Resets the sketch to its initial empty state.
+    pub fn clear(&mut self) {
+        self.counters.iter_mut().for_each(|c| *c = 0);
+        self.total = 0;
+    }
 }
 
 impl<T: Hash, H: BuildHasher> FrequencySketch<T> for CountMinSketch<H> {
@@ -128,20 +152,19 @@ impl<T: Hash, H: BuildHasher> FrequencySketch<T> for CountMinSketch<H> {
     }
 
     fn error_rate(&self) -> f64 {
-        self.error_rate
+        Self::error_rate(self)
     }
 
     fn confidence(&self) -> f64 {
-        self.confidence
+        Self::confidence(self)
     }
 
     fn total(&self) -> u64 {
-        self.total
+        Self::total(self)
     }
 
     fn clear(&mut self) {
-        self.counters.iter_mut().for_each(|c| *c = 0);
-        self.total = 0;
+        Self::clear(self)
     }
 }
 

@@ -96,6 +96,30 @@ impl<H: BuildHasher> BloomFilter<H> {
         let bit = pos % 64;
         (self.bits[word] >> bit) & 1 == 1
     }
+
+    /// Returns the configured false positive rate.
+    #[must_use]
+    pub fn false_positive_rate(&self) -> f64 {
+        self.fpp
+    }
+
+    /// Returns the number of items inserted.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.count
+    }
+
+    /// Returns true if no items have been inserted.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.count == 0
+    }
+
+    /// Resets the filter to its initial empty state.
+    pub fn clear(&mut self) {
+        self.bits.iter_mut().for_each(|w| *w = 0);
+        self.count = 0;
+    }
 }
 
 impl<T: Hash, H: BuildHasher> MembershipSketch<T> for BloomFilter<H> {
@@ -120,16 +144,15 @@ impl<T: Hash, H: BuildHasher> MembershipSketch<T> for BloomFilter<H> {
     }
 
     fn false_positive_rate(&self) -> f64 {
-        self.fpp
+        Self::false_positive_rate(self)
     }
 
     fn len(&self) -> usize {
-        self.count
+        Self::len(self)
     }
 
     fn clear(&mut self) {
-        self.bits.iter_mut().for_each(|w| *w = 0);
-        self.count = 0;
+        Self::clear(self)
     }
 }
 
