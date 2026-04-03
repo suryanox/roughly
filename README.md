@@ -1,8 +1,8 @@
 # roughly
 
-[![Crates.io](https://img.shields.io/crates/v/roughly.svg)](https://crates.io/crates/roughly)
-[![Docs.rs](https://docs.rs/roughly/badge.svg)](https://docs.rs/roughly)
 [![CI](https://github.com/suryanox/roughly/actions/workflows/ci.yaml/badge.svg)](https://github.com/suryanox/roughly/actions)
+[![Crates.io](https://img.shields.io/crates/v/roughly.svg)](https://crates.io/crates/roughly)
+[![Downloads](https://img.shields.io/crates/d/roughly)](https://crates.io/crates/roughly)
 
 > Probabilistic data structures for Rust, because sometimes close enough is good enough.
 
