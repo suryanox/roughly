@@ -1,0 +1,24 @@
+[package]
+name = "roughly"
+version = "0.1.0"
+edition = "2021"
+authors = ["suryanox"]
+description = "Probabilistic data structures for Rust — because sometimes close enough is good enough."
+documentation = "https://docs.rs/roughly"
+homepage = "https://github.com/suryanox/roughly"
+repository = "https://github.com/suryanox/roughly"
+readme = "README.md"
+license = "MIT"
+keywords = ["bloom-filter", "hyperloglog", "count-min-sketch", "probabilistic", "approximate"]
+categories = ["data-structures", "algorithms"]
+exclude = ["benches/", "tests/", ".github/"]
+
+[features]
+default = ["std"]
+std = []
+serde = ["dep:serde"]
+
+[dependencies]
+ahash = "0.8"
+serde = { version = "1.0", features = ["derive"], optional = true }
+
