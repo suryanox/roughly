@@ -33,6 +33,7 @@ use alloc::vec::Vec;
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(deserialize = "H: Default")))]
 pub struct CountMinSketch<H = DefaultHasher> {
     counters: Vec<u64>,
     width: usize,
@@ -40,7 +41,7 @@ pub struct CountMinSketch<H = DefaultHasher> {
     total: u64,
     error_rate: f64,
     confidence: f64,
-    #[cfg_attr(feature = "serde", serde(skip, default = "crate::hash::default_hasher"))]
+    #[cfg_attr(feature = "serde", serde(skip, default))]
     build_hasher: H,
 }
 

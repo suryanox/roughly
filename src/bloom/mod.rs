@@ -34,13 +34,14 @@ use alloc::vec::Vec;
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(deserialize = "H: Default")))]
 pub struct BloomFilter<H = DefaultHasher> {
     bits: Vec<u64>,
     num_bits: u64,
     num_hashes: u32,
     count: usize,
     fpp: f64,
-    #[cfg_attr(feature = "serde", serde(skip, default = "crate::hash::default_hasher"))]
+    #[cfg_attr(feature = "serde", serde(skip, default))]
     build_hasher: H,
 }
 

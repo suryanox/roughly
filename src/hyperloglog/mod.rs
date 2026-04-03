@@ -33,13 +33,14 @@ use alloc::vec::Vec;
 /// ```
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(bound(deserialize = "H: Default")))]
 pub struct HyperLogLog<H = DefaultHasher> {
     registers: Vec<u8>,
     m: usize,
     b: u32,
     alpha: f64,
     std_error: f64,
-    #[cfg_attr(feature = "serde", serde(skip, default = "crate::hash::default_hasher"))]
+    #[cfg_attr(feature = "serde", serde(skip, default))]
     build_hasher: H,
 }
 
